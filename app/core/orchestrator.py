@@ -30,17 +30,26 @@ Reply ONLY:
 inventory
 
 If the request is about:
-- revenue
-- profit
 - sales
 - analytics
-- business summary
-- orders
 - best selling product
 - business performance
+- sales report
 
 Reply ONLY:
 analytics
+
+If the request is about:
+- revenue
+- profit
+- expense
+- finance
+- financial
+- profit margin
+- income
+
+Reply ONLY:
+finance
 
 If the request is about:
 - reorder
@@ -66,6 +75,9 @@ User:
 """
 
         tool = ask_gemini(prompt).strip().lower()
+
+        # Remove markdown/code block formatting if Gemini adds it
+        tool = tool.replace("```", "").replace("`", "").strip()
 
         if tool in self.tools:
             return self.tools[tool](user_message)
