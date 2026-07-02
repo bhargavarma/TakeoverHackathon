@@ -45,27 +45,38 @@ If the request is about:
 - expense
 - finance
 - financial
-- profit margin
 - income
+- profit margin
 
 Reply ONLY:
 finance
 
 If the request is about:
 - reorder
-- restock
 - procurement
 - supplier
 - purchase order
-- generate purchase order
-- approve purchase order
-- reject purchase order
-- pending purchase orders
 - vendor
 - buying inventory
+- approve purchase order
+- reject purchase order
 
 Reply ONLY:
 procurement
+
+If the request is about:
+- notification
+- alert
+- alerts
+- warning
+- warnings
+- pending approval
+- pending approvals
+- pending purchase orders
+- critical issues
+
+Reply ONLY:
+notification
 
 Otherwise reply ONLY:
 llm
@@ -75,8 +86,6 @@ User:
 """
 
         tool = ask_gemini(prompt).strip().lower()
-
-        # Remove markdown/code block formatting if Gemini adds it
         tool = tool.replace("```", "").replace("`", "").strip()
 
         if tool in self.tools:
