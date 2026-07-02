@@ -36,3 +36,43 @@ def update_stock(db: Session, product_name: str, new_stock: int):
     db.refresh(product)
 
     return product
+from app.core.database import SessionLocal
+
+
+def inventory_tool(user_message: str):
+    db = SessionLocal()
+
+    try:
+        message = user_message.lower()
+
+        if "low" in message:
+            products = get_low_stock_products(db)
+
+            return {
+                "tool": "inventory",
+                "result": [
+                    {
+                        "name": p.name,
+                        "stock": p.stock,
+                        "minimum_stock": p.minimum_stock,
+                    }
+                    for p in products
+                ],
+            }
+
+        products = get_all_products(db)
+
+        return {
+            "tool": "inventory",
+            "result": [
+                {
+                    "name": p.name,
+                    "stock": p.stock,
+                    "price": p.price,
+                }
+                for p in products
+            ],
+        }
+
+    finally:
+        db.close()
