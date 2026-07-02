@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from app.core.database import Base, SessionLocal, engine
 from app.core.seed import seed_products
 from app.models.product import Product
+from app.models.sale import Sale
 from app.api.chat import router as chat_router
 from app.api.inventory import router as inventory_router
 
