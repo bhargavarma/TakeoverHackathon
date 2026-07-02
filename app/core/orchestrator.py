@@ -13,13 +13,52 @@ You are an AI COO.
 Available tools:
 {list(self.tools.keys())}
 
-If the user is asking about inventory, stock, products, quantity, low stock or warehouse,
-reply with ONLY:
+Your job is to choose ONLY ONE tool.
 
+Rules:
+
+If the request is about:
+- inventory
+- stock
+- products
+- quantity
+- warehouse
+- low stock
+- high stock
+
+Reply ONLY:
 inventory
 
-Otherwise reply with:
+If the request is about:
+- revenue
+- profit
+- sales
+- analytics
+- business summary
+- orders
+- best selling product
+- business performance
 
+Reply ONLY:
+analytics
+
+If the request is about:
+- reorder
+- restock
+- procurement
+- supplier
+- purchase order
+- generate purchase order
+- approve purchase order
+- reject purchase order
+- pending purchase orders
+- vendor
+- buying inventory
+
+Reply ONLY:
+procurement
+
+Otherwise reply ONLY:
 llm
 
 User:
@@ -33,7 +72,7 @@ User:
 
         return {
             "tool": "llm",
-            "response": ask_gemini(user_message)
+            "response": ask_gemini(user_message),
         }
 
 

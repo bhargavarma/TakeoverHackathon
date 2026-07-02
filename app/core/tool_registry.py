@@ -1,7 +1,9 @@
 from app.tools.inventory_tool import inventory_tool
-
-# We'll add the others later as we build them.
+from app.tools.analytics_tool import analytics_tool
+from app.tools.procurement_tool import procurement_tool
 
 TOOL_REGISTRY = {
     "inventory": inventory_tool,
+    "analytics": analytics_tool,
+    "procurement": procurement_tool,
 }
