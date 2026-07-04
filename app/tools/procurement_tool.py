@@ -125,6 +125,12 @@ def generate_purchase_order(
     if not product:
         return None
 
+    if pending_order_exists(db, product.name):
+        return {
+            "status": "already_pending",
+            "product": product.name,
+        }
+
     avg_daily_sales = calculate_average_daily_sales(
         db,
         product.id,
@@ -185,6 +191,22 @@ def generate_purchase_order(
         "status": order.status,
     }
 
+
+
+# ----------------------------------------------------
+# DUPLICATE PURCHASE ORDER CHECK
+# ----------------------------------------------------
+
+def pending_order_exists(db: Session, product_name: str):
+    return (
+        db.query(PurchaseOrder)
+        .filter(
+            func.lower(PurchaseOrder.product_name) == product_name.lower(),
+            PurchaseOrder.status == "PENDING",
+        )
+        .first()
+        is not None
+    )
 
 # ----------------------------------------------------
 # APPROVAL
@@ -392,6 +414,13 @@ Generated automatically by AI COO.
                         "message": "Unable to generate purchase recommendation.",
                     }
 
+                if recommendation.get("status") == "already_pending":
+                    return {
+                        "tool": "procurement",
+                        "action": "already_pending",
+                        "message": f"A pending purchase order already exists for {recommendation['product']}.",
+                    }
+
                 comparison = recommendation["supplier_comparison"]
                 send_email(
                     subject="🛒 Purchase Order Approval Required",
@@ -501,7 +530,7 @@ Generated automatically by AI COO.
                 product.name,
             )
 
-            if recommendation:
+            if recommendation and recommendation.get("status") != "already_pending":
 
                 recommendations.append(
                     {
@@ -546,4 +575,4 @@ Generated automatically by AI COO.
         }
 
     finally:
-        db.close()
+        db.close()                                

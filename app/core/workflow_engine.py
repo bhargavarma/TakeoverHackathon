@@ -18,10 +18,31 @@ class WorkflowEngine:
 
         results = {}
 
+        # ----------------------------
+        # Inventory Review (Always First)
+        # ----------------------------
+        inventory = inventory_tool(user_message)
+        results["inventory"] = inventory
+
+        # ----------------------------
+        # AI Decision:
+        # Does Procurement Need To Run?
+        # ----------------------------
+        procurement_required = False
+
+        for product in inventory.get("products", []):
+
+            if product.get("severity") in ["Low", "Critical"]:
+                procurement_required = True
+                break
+
+        # ----------------------------
+        # Continue Workflow
+        # ----------------------------
         for step in plan.get("steps", []):
 
             if step == "inventory":
-                results["inventory"] = inventory_tool(user_message)
+                continue
 
             elif step == "analytics":
                 results["analytics"] = analytics_tool(user_message)
@@ -30,16 +51,36 @@ class WorkflowEngine:
                 results["finance"] = finance_tool(user_message)
 
             elif step == "procurement":
-                results["procurement"] = procurement_tool(user_message)
+
+                if procurement_required:
+
+                    results["procurement"] = procurement_tool(
+                        "generate purchase orders"
+                    )
+
+                else:
+
+                    results["procurement"] = {
+                        "tool": "procurement",
+                        "action": "none",
+                        "summary": "Inventory is healthy. No purchase orders required.",
+                        "recommendations": [],
+                    }
 
             elif step == "notifications":
                 results["notifications"] = notification_tool(user_message)
 
+        # ----------------------------
+        # AI Executive Summary
+        # ----------------------------
         summary = format_agent_response(
             "Business Operations Workflow",
             results,
         )
 
+        # ----------------------------
+        # Daily Executive Report Email
+        # ----------------------------
         try:
 
             report = generate_daily_report(
@@ -55,10 +96,9 @@ class WorkflowEngine:
             )
 
         except Exception as e:
+
             print("Daily report email failed:", e)
 
-
-        
         return {
             "workflow": plan.get("workflow"),
             "summary": summary,

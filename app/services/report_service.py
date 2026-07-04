@@ -7,67 +7,126 @@ def generate_daily_report(
     finance,
     procurement,
 ):
+
+    inventory_summary = inventory.get(
+        "summary",
+        "Inventory review completed."
+    )
+
+    business_summary = analytics.get(
+        "summary",
+        "Business analytics completed."
+    )
+
+    finance_metrics = finance.get("metrics", {})
+
+    procurement_count = len(
+        procurement.get("recommendations", [])
+    )
+
+    if procurement_count > 0:
+
+        procurement_summary = (
+            f"{procurement_count} purchase recommendation(s) "
+            "generated and waiting for approval."
+        )
+
+        ai_recommendation = (
+            "Approve today's purchase orders to avoid "
+            "future stock shortages."
+        )
+
+    else:
+
+        procurement_summary = (
+            "No procurement action required."
+        )
+
+        ai_recommendation = (
+            "Inventory is healthy. "
+            "No purchase orders were required today."
+        )
+
     report = f"""
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🤖 AI COO DAILY BUSINESS REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 Good Morning,
 
-Your AI COO has completed today's operational review.
+Your AI COO has successfully completed today's
+business operations review.
 
-==================================================
-📊 DAILY BUSINESS OPERATIONS REPORT
-==================================================
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📅 DATE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Date:
 {datetime.now().strftime("%d %B %Y")}
 
-==================================================
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🤖 TODAY'S AI DECISIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Reviewed Inventory
+
+✅ Analysed Business Performance
+
+✅ Reviewed Financial Health
+
+{"✅ Generated Purchase Orders" if procurement_count > 0 else "✅ Procurement Review Completed"}
+
+✅ Executive Report Generated
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 💰 FINANCIAL OVERVIEW
-==================================================
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Revenue
-₹{finance["metrics"]["total_revenue"]:.2f}
+
+₹{finance_metrics.get("total_revenue", 0):.2f}
 
 Profit
-₹{finance["metrics"]["total_profit"]:.2f}
+
+₹{finance_metrics.get("total_profit", 0):.2f}
 
 Profit Margin
-{finance["metrics"]["profit_margin"]}%
 
-==================================================
+{finance_metrics.get("profit_margin", 0)}%
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📦 INVENTORY STATUS
-==================================================
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-{inventory["summary"]}
+{inventory_summary}
 
-==================================================
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📈 BUSINESS ANALYTICS
-==================================================
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Orders Processed
-{analytics["metrics"]["total_orders"]}
+{business_summary}
 
 Best Selling Product
 
-{analytics["best_selling_product"]["product"]}
+{analytics.get("best_selling_product", {}).get("product", "N/A")}
 
-==================================================
-🛒 PROCUREMENT
-==================================================
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🛒 PROCUREMENT STATUS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-{len(procurement.get("recommendations", []))}
-Purchase Recommendation(s) Generated
+{procurement_summary}
 
-==================================================
-🤖 AI RECOMMENDATION
-==================================================
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 AI RECOMMENDATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Review today's purchase recommendations.
+{ai_recommendation}
 
-Approve urgent purchase orders to
-avoid stock shortages.
-
-==================================================
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Generated automatically by AI COO.
+
+No manual intervention was required
+unless purchase approval is pending.
 """
 
     return report

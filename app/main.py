@@ -1,29 +1,65 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.database import Base, SessionLocal, engine
 from app.core.seed import seed_products
+from app.core.scheduler import scheduler, start_scheduler
+
 from app.models.purchase_order import PurchaseOrder
 from app.models.product import Product
 from app.models.sale import Sale
+
 from app.api.chat import router as chat_router
 from app.api.inventory import router as inventory_router
 
-# Create database tables
+
+# --------------------------------------------------
+# Database Setup
+# --------------------------------------------------
+
 Base.metadata.create_all(bind=engine)
 
-# Seed demo data
 db = SessionLocal()
 seed_products(db)
 db.close()
+
+
+# --------------------------------------------------
+# Application Lifespan
+# --------------------------------------------------
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    print("Starting AI COO Scheduler...")
+
+    start_scheduler()
+
+    yield
+
+    print("Stopping AI COO Scheduler...")
+
+    scheduler.shutdown()
+
+
+# --------------------------------------------------
+# FastAPI App
+# --------------------------------------------------
 
 app = FastAPI(
     title="AI Business Operations Agent",
     description="AI COO for SMEs",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
-# -------------------- CORS --------------------
+
+# --------------------------------------------------
+# CORS
+# --------------------------------------------------
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -34,17 +70,29 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# ----------------------------------------------
+
+
+# --------------------------------------------------
+# Routes
+# --------------------------------------------------
 
 app.include_router(chat_router)
 app.include_router(inventory_router)
 
 
+# --------------------------------------------------
+# Health
+# --------------------------------------------------
+
 @app.get("/")
 def root():
-    return {"message": "AI Business Operations Agent is running 🚀"}
+    return {
+        "message": "AI Business Operations Agent is running 🚀"
+    }
 
 
 @app.get("/health")
 def health():
-    return {"status": "healthy"}
+    return {
+        "status": "healthy"
+    }
