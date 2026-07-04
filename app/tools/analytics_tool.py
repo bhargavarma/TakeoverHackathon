@@ -21,6 +21,7 @@ def get_total_orders(db: Session):
 
 
 def get_best_selling_product(db: Session):
+
     result = (
         db.query(
             Product.name,
@@ -41,69 +42,91 @@ def get_best_selling_product(db: Session):
     return None
 
 
+def get_slow_moving_products(db: Session):
+
+    results = (
+        db.query(
+            Product.name,
+            func.sum(Sale.quantity).label("total_sold")
+        )
+        .join(Sale, Product.id == Sale.product_id)
+        .group_by(Product.id)
+        .order_by(func.sum(Sale.quantity).asc())
+        .limit(3)
+        .all()
+    )
+
+    return [
+        {
+            "product": r.name,
+            "quantity_sold": r.total_sold,
+        }
+        for r in results
+    ]
+
+
 def analytics_tool(user_message: str):
+
     db = SessionLocal()
 
     try:
+
+        revenue = get_total_revenue(db)
+        profit = get_total_profit(db)
+        orders = get_total_orders(db)
+        best = get_best_selling_product(db)
+        slow = get_slow_moving_products(db)
+
+        action = "business_analytics"
+
         message = user_message.lower()
 
-        # Revenue
         if "revenue" in message:
-            return {
-                "tool": "analytics",
-                "total_revenue": get_total_revenue(db)
-            }
+            action = "revenue_analysis"
 
-        # Profit
         elif "profit" in message:
-            return {
-                "tool": "analytics",
-                "total_profit": get_total_profit(db)
-            }
+            action = "profit_analysis"
 
-        # Orders
         elif "order" in message:
-            return {
-                "tool": "analytics",
-                "total_orders": get_total_orders(db)
-            }
+            action = "order_analysis"
 
-        # Best Selling Product
         elif (
             "best" in message
             or "top" in message
             or "selling" in message
-            or "highest selling" in message
         ):
-            return {
-                "tool": "analytics",
-                "best_selling_product": get_best_selling_product(db)
-            }
+            action = "sales_analysis"
 
-        # Business Summary
-        elif (
-            "summary" in message
-            or "overview" in message
-            or "performance" in message
-            or "analytics" in message
-        ):
-            return {
-                "tool": "analytics",
-                "summary": {
-                    "total_revenue": get_total_revenue(db),
-                    "total_profit": get_total_profit(db),
-                    "total_orders": get_total_orders(db),
-                    "best_selling_product": get_best_selling_product(db),
-                },
-            }
+        summary = (
+            f"Business has processed {orders} orders, "
+            f"generated ₹{revenue:.2f} revenue "
+            f"with ₹{profit:.2f} profit."
+        )
 
-        # Default
+        recommendations = []
+
+        if best:
+            recommendations.append(
+                f"Maintain inventory of {best['product']}."
+            )
+
+        if slow:
+            recommendations.append(
+                "Consider discounts for slow-moving products."
+            )
+
         return {
             "tool": "analytics",
-            "message": (
-                "I can help with revenue, profit, orders, "
-                "best selling product, or a business summary."
-            ),
+            "action": action,
+            "summary": summary,
+            "metrics": {
+                "total_revenue": revenue,
+                "total_profit": profit,
+                "total_orders": orders,
+            },
+            "best_selling_product": best,
+            "slow_moving_products": slow,
+            "recommendations": recommendations,
         }
 
     finally:

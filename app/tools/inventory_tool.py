@@ -54,29 +54,71 @@ def inventory_tool(user_message: str):
     try:
         message = user_message.lower()
 
-        # Decide which products to fetch
         if "low" in message:
             products = get_low_stock_products(db)
+            action = "low_stock_analysis"
 
         elif "high" in message:
             products = get_high_stock_products(db)
+            action = "high_stock_analysis"
 
         else:
             products = get_all_products(db)
+            action = "inventory_overview"
 
-        return {
-            "tool": "inventory",
-            "result": [
+        inventory = []
+        critical_count = 0
+
+        for p in products:
+
+            severity = "Normal"
+
+            if p.stock <= p.minimum_stock:
+
+                if p.stock <= (p.minimum_stock * 0.5):
+                    severity = "Critical"
+                else:
+                    severity = "Low"
+
+                critical_count += 1
+
+            inventory.append(
                 {
                     "name": p.name,
-                    "stock": p.stock,
+                    "current_stock": p.stock,
                     "minimum_stock": p.minimum_stock,
                     "cost_price": p.cost_price,
                     "selling_price": p.selling_price,
                     "supplier": p.supplier,
+                    "severity": severity,
                 }
-                for p in products
-            ],
+            )
+
+        if action == "inventory_overview":
+            summary = (
+                f"Inventory contains {len(inventory)} products."
+            )
+
+        elif action == "low_stock_analysis":
+            summary = (
+                f"{critical_count} products require replenishment."
+            )
+
+        else:
+            summary = (
+                f"{len(inventory)} products are sufficiently stocked."
+            )
+
+        return {
+            "tool": "inventory",
+            "action": action,
+            "summary": summary,
+            "products": inventory,
+            "next_action": (
+                "Generate purchase orders for low stock products."
+                if critical_count > 0
+                else "No procurement action required."
+            ),
         }
 
     finally:
