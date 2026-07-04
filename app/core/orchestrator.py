@@ -1,95 +1,101 @@
 from app.core.llm import ask_gemini
 from app.core.tool_registry import TOOL_REGISTRY
+from app.core.workflow_engine import workflow_engine
 
 
 class Orchestrator:
+
     def __init__(self):
         self.tools = TOOL_REGISTRY
 
     def route(self, user_message: str):
+
         prompt = f"""
-You are an AI COO.
+You are the AI COO of a company.
 
-Available tools:
-{list(self.tools.keys())}
+Your job is to decide whether the user needs:
 
-Your job is to choose ONLY ONE tool.
+1. A COMPLETE BUSINESS WORKFLOW
 
-Rules:
+or
 
-If the request is about:
-- inventory
-- stock
-- products
-- quantity
-- warehouse
-- low stock
-- high stock
+2. A SINGLE AGENT
+
+Available Agents:
+
+inventory
+analytics
+finance
+procurement
+notification
+
+If the user asks things like:
+
+- daily review
+- business review
+- business health
+- review my business
+- run operations
+- today's report
+- executive summary
+- company review
+- analyze my business
+- review today's business
+- perform daily operations
 
 Reply ONLY:
+
+workflow
+
+------------------------------------
+
+If the user asks ONLY about inventory,
+reply ONLY:
+
 inventory
 
-If the request is about:
-- sales
-- analytics
-- best selling product
-- business performance
-- sales report
+If the user asks ONLY about analytics,
+reply ONLY:
 
-Reply ONLY:
 analytics
 
-If the request is about:
-- revenue
-- profit
-- expense
-- finance
-- financial
-- income
-- profit margin
+If the user asks ONLY about finance,
+reply ONLY:
 
-Reply ONLY:
 finance
 
-If the request is about:
-- reorder
-- procurement
-- supplier
-- purchase order
-- vendor
-- buying inventory
-- approve purchase order
-- reject purchase order
+If the user asks ONLY about procurement,
+reply ONLY:
 
-Reply ONLY:
 procurement
 
-If the request is about:
-- notification
-- alert
-- alerts
-- warning
-- warnings
-- pending approval
-- pending approvals
-- pending purchase orders
-- critical issues
+If the user asks ONLY about notifications,
+reply ONLY:
 
-Reply ONLY:
 notification
 
 Otherwise reply ONLY:
+
 llm
 
 User:
+
 {user_message}
 """
 
-        tool = ask_gemini(prompt).strip().lower()
-        tool = tool.replace("```", "").replace("`", "").strip()
+        decision = ask_gemini(prompt).strip().lower()
 
-        if tool in self.tools:
-            return self.tools[tool](user_message)
+        decision = (
+            decision.replace("```", "")
+            .replace("`", "")
+            .strip()
+        )
+
+        if decision == "workflow":
+            return workflow_engine.execute(user_message)
+
+        if decision in self.tools:
+            return self.tools[decision](user_message)
 
         return {
             "tool": "llm",
