@@ -1,47 +1,55 @@
-import { Sparkles,Boxes,ShoppingCart } from "lucide-react";
+import { Sparkles, Boxes, ShoppingCart } from "lucide-react";
+import { runReview } from "../../services/dashboardService";
+import { useNavigate } from "react-router-dom";
 
-export default function QuickActions(){
+export default function QuickActions() {
 
-const buttons=[
+  const navigate = useNavigate();
 
-["Run Daily Review",Sparkles],
+  async function handleReview() {
+    try {
+      const res = await runReview();
+      alert(res.message);
+    } catch {
+      alert("Failed to run AI Review");
+    }
+  }
 
-["Inventory Scan",Boxes],
+  return (
+    <div className="rounded-3xl bg-white/5 border border-white/10 p-8">
 
-["Generate PO",ShoppingCart],
+      <h2 className="text-2xl font-bold mb-6">
+        Quick Actions
+      </h2>
 
-];
+      <div className="space-y-4">
 
-return(
+        <button
+          onClick={handleReview}
+          className="w-full rounded-2xl bg-white/5 hover:bg-violet-600 transition p-5 flex items-center gap-4"
+        >
+          <Sparkles />
+          Run Daily Review
+        </button>
 
-<div className="rounded-3xl bg-white/5 border border-white/10 p-8">
+        <button
+          onClick={() => navigate("/inventory")}
+          className="w-full rounded-2xl bg-white/5 hover:bg-violet-600 transition p-5 flex items-center gap-4"
+        >
+          <Boxes />
+          Inventory Scan
+        </button>
 
-<h2 className="text-2xl font-bold mb-6">
+        <button
+          onClick={() => navigate("/procurement")}
+          className="w-full rounded-2xl bg-white/5 hover:bg-violet-600 transition p-5 flex items-center gap-4"
+        >
+          <ShoppingCart />
+          Generate PO
+        </button>
 
-Quick Actions
+      </div>
 
-</h2>
-
-<div className="space-y-4">
-
-{buttons.map(([title,Icon])=>(
-
-<button
-key={title}
-className="w-full rounded-2xl bg-white/5 hover:bg-violet-600 transition p-5 flex items-center gap-4">
-
-<Icon/>
-
-{title}
-
-</button>
-
-))}
-
-</div>
-
-</div>
-
-)
-
+    </div>
+  );
 }

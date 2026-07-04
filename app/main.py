@@ -10,10 +10,12 @@ from app.core.scheduler import scheduler, start_scheduler
 from app.models.purchase_order import PurchaseOrder
 from app.models.product import Product
 from app.models.sale import Sale
-
+from app.api.auth import router as auth_router
 from app.api.chat import router as chat_router
 from app.api.inventory import router as inventory_router
-
+from app.models.user import User
+from app.api.dashboard import router as dashboard_router
+from app.api.procurement import router as procurement_router
 
 # --------------------------------------------------
 # Database Setup
@@ -78,6 +80,9 @@ app.add_middleware(
 
 app.include_router(chat_router)
 app.include_router(inventory_router)
+app.include_router(auth_router)
+app.include_router(dashboard_router)
+app.include_router(procurement_router)
 
 
 # --------------------------------------------------

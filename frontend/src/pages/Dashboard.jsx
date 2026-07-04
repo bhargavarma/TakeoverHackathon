@@ -10,7 +10,7 @@ import useDashboard from "../hooks/useDashboard";
 
 export default function Dashboard() {
 
-  const { loading } = useDashboard();
+  const { loading, data } = useDashboard();
 
   if (loading) {
     return (
@@ -18,12 +18,10 @@ export default function Dashboard() {
 
         <div className="text-center">
 
-          <div className="h-20 w-20 rounded-full border-4 border-violet-500 border-t-transparent animate-spin mx-auto"/>
+          <div className="h-20 w-20 rounded-full border-4 border-violet-500 border-t-transparent animate-spin mx-auto"></div>
 
           <h2 className="mt-8 text-2xl font-bold">
-
             AI COO is analysing your business...
-
           </h2>
 
         </div>
@@ -33,33 +31,30 @@ export default function Dashboard() {
   }
 
   return (
-
     <div className="space-y-8">
 
-      <Hero/>
+      <Hero />
 
-      <StatsGrid/>
+      <StatsGrid data={data} />
 
       <div className="grid xl:grid-cols-3 gap-6">
 
-        <BusinessHealth/>
+        <BusinessHealth />
 
-        <QuickActions/>
+        <QuickActions />
 
-        <RecentApprovals/>
+        <RecentApprovals />
 
       </div>
 
       <div className="grid xl:grid-cols-2 gap-6">
 
-        <RevenueChart/>
+        <RevenueChart />
 
-        <ActivityTimeline/>
+        <ActivityTimeline />
 
       </div>
 
     </div>
-
   );
-
 }
