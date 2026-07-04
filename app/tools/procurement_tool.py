@@ -267,15 +267,48 @@ def procurement_tool(user_message: str):
             send_email(
                 subject="✅ Purchase Order Approved",
                 body=f"""
-            Purchase Order Approved
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ PURCHASE ORDER APPROVED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-            Product: {order.product_name}
-            Supplier: {order.supplier}
-            Quantity: {order.quantity}
-            Estimated Cost: ₹{order.estimated_cost}
+Good Afternoon,
 
-            Status: APPROVED
-            """
+The following purchase order has been
+approved successfully.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 PRODUCT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+{order.product_name}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏢 SUPPLIER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+{order.supplier}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 ORDER DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Quantity          {order.quantity}
+
+Estimated Cost    ₹{order.estimated_cost}
+
+Status            APPROVED
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NEXT STEP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The procurement process can now proceed
+with supplier fulfillment.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Generated automatically by AI COO.
+"""
             )
             return {
                 "tool": "procurement",
@@ -363,26 +396,68 @@ def procurement_tool(user_message: str):
                 send_email(
                     subject="🛒 Purchase Order Approval Required",
                     body=f"""
-                AI COO has generated a purchase recommendation.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🛒 PURCHASE ORDER APPROVAL REQUIRED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-                Product: {recommendation['product']}
+Good Afternoon,
 
-                Current Stock: {recommendation['current_stock']}
-                Minimum Stock: {recommendation['minimum_stock']}
+Your AI COO has completed supplier evaluation
+and generated a purchase recommendation.
 
-                Recommended Quantity: {recommendation['recommended_quantity']}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 PRODUCT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-                Supplier: {recommendation['supplier']}
+{recommendation['product']}
 
-                Price Per Unit: ₹{recommendation['price_per_unit']}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏢 RECOMMENDED SUPPLIER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-                Estimated Cost: ₹{recommendation['estimated_cost']}
+{recommendation['supplier']}
 
-                Delivery Time: {recommendation['delivery_days']} day(s)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 FINANCIAL SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-                Status:
-                WAITING FOR APPROVAL
-                """
+Price / Unit      ₹{recommendation['price_per_unit']}
+
+Quantity          {recommendation['recommended_quantity']}
+
+Estimated Cost    ₹{recommendation['estimated_cost']}
+
+Delivery Time     {recommendation['delivery_days']} day(s)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🤖 AI DECISION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Current inventory has fallen below the
+recommended safety stock level.
+
+Demand forecasting predicts inventory
+depletion within the next few days.
+
+Supplier Selection Criteria
+
+✓ Competitive Pricing
+
+✓ Fast Delivery
+
+✓ High Supplier Rating
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ACTION REQUIRED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Please review and approve this purchase
+order from the AI COO Dashboard.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Generated automatically by AI COO.
+"""
                 )
 
                 return {

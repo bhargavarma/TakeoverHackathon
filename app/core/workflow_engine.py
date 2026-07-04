@@ -1,5 +1,7 @@
 from app.core.planner import create_execution_plan
 from app.core.formatter import format_agent_response
+from app.services.report_service import generate_daily_report
+from app.services.email_service import send_email
 
 from app.tools.inventory_tool import inventory_tool
 from app.tools.analytics_tool import analytics_tool
@@ -38,6 +40,25 @@ class WorkflowEngine:
             results,
         )
 
+        try:
+
+            report = generate_daily_report(
+                results.get("inventory", {}),
+                results.get("analytics", {}),
+                results.get("finance", {}),
+                results.get("procurement", {}),
+            )
+
+            send_email(
+                subject="📊 Daily Business Operations Report | AI COO",
+                body=report,
+            )
+
+        except Exception as e:
+            print("Daily report email failed:", e)
+
+
+        
         return {
             "workflow": plan.get("workflow"),
             "summary": summary,
