@@ -3,27 +3,37 @@ import useProcurement from "../hooks/useProcurement";
 
 export default function Procurement() {
 
-  const { loading, orders } = useProcurement();
+  const {
+    loading,
+    orders,
+    approve,
+    reject,
+  } = useProcurement();
 
   if (loading)
-    return <h2>Loading Procurement...</h2>;
+    return (
+      <div className="text-2xl">
+        Loading Purchase Orders...
+      </div>
+    );
 
   return (
+
     <div>
 
       <h1 className="text-4xl font-bold mb-8">
 
-        AI Purchase Recommendations
+        Purchase Orders
 
       </h1>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid xl:grid-cols-2 gap-6">
 
-        {orders.map((order, index) => (
+        {orders.map((order)=>(
 
           <div
-            key={index}
-            className="rounded-3xl bg-white/5 border border-white/10 p-7"
+            key={order.id}
+            className="rounded-3xl border border-white/10 bg-white/5 p-7"
           >
 
             <h2 className="text-2xl font-bold">
@@ -32,73 +42,95 @@ export default function Procurement() {
 
             </h2>
 
-            <div className="mt-5 space-y-3">
-
-              <p>
-
-                Current Stock :
-                <strong>
-                  {" "}
-                  {order.current_stock}
-                </strong>
-
-              </p>
-
-              <p>
-
-                Suggested Qty :
-                <strong>
-                  {" "}
-                  {order.recommended_quantity}
-                </strong>
-
-              </p>
+            <div className="mt-6 space-y-3">
 
               <p>
 
                 Supplier :
+
                 <strong>
+
                   {" "}
-                  {order.best_supplier}
+
+                  {order.supplier}
+
                 </strong>
 
               </p>
 
               <p>
 
-                Estimated Cost :
+                Quantity :
+
                 <strong>
+
                   {" "}
+
+                  {order.quantity}
+
+                </strong>
+
+              </p>
+
+              <p>
+
+                Cost :
+
+                <strong>
+
+                  {" "}
+
                   ₹{order.estimated_cost}
+
+                </strong>
+
+              </p>
+
+              <p>
+
+                Status :
+
+                <strong>
+
+                  {" "}
+
+                  {order.status}
+
                 </strong>
 
               </p>
 
             </div>
 
-            <div className="flex gap-4 mt-8">
+            {order.status === "PENDING" && (
 
-              <button
-                className="flex-1 rounded-xl bg-green-600 hover:bg-green-700 py-3 flex justify-center items-center gap-2"
-              >
+              <div className="flex gap-4 mt-8">
 
-                <Check size={18} />
+                <button
+                  onClick={()=>approve(order.id)}
+                  className="flex-1 rounded-xl bg-green-600 py-3 flex justify-center items-center gap-2"
+                >
 
-                Approve
+                  <Check size={18}/>
 
-              </button>
+                  Approve
 
-              <button
-                className="flex-1 rounded-xl bg-red-600 hover:bg-red-700 py-3 flex justify-center items-center gap-2"
-              >
+                </button>
 
-                <X size={18} />
+                <button
+                  onClick={()=>reject(order.id)}
+                  className="flex-1 rounded-xl bg-red-600 py-3 flex justify-center items-center gap-2"
+                >
 
-                Reject
+                  <X size={18}/>
 
-              </button>
+                  Reject
 
-            </div>
+                </button>
+
+              </div>
+
+            )}
 
           </div>
 
@@ -107,5 +139,7 @@ export default function Procurement() {
       </div>
 
     </div>
+
   );
+
 }

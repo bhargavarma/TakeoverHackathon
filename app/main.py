@@ -2,11 +2,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from app.api.purchase_orders import router as purchase_router
 from app.core.database import Base, SessionLocal, engine
 from app.core.seed import seed_products
 from app.core.scheduler import scheduler, start_scheduler
-
+from app.api.dashboard import router as dashboard_router
 from app.models.purchase_order import PurchaseOrder
 from app.models.product import Product
 from app.models.sale import Sale
@@ -83,7 +83,7 @@ app.include_router(inventory_router)
 app.include_router(auth_router)
 app.include_router(dashboard_router)
 app.include_router(procurement_router)
-
+app.include_router(purchase_router)
 
 # --------------------------------------------------
 # Health

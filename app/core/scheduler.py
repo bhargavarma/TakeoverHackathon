@@ -52,7 +52,7 @@ def start_scheduler():
     scheduler.add_job(
         inventory_monitor,
         trigger="interval",
-        seconds=30,
+        hours=8,
         id="inventory_monitor",
         replace_existing=True,
     )
